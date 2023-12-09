@@ -36,18 +36,20 @@ def get_value_for_numbers(nums: []) -> int:
     :param nums: list of numbers
     :return: THe next number in the number row
     """
-    numbers: [[int]] = [nums]
 
-    while True:
-        nums = []
-        for index in range(1, len(numbers[-1])):
-            nums.append(numbers[-1][index] - numbers[-1][index-1])
-        numbers.append(nums)
+    # if all given numbers are 0 then return 0
+    counter = Counter(nums)
+    most_common = counter.most_common(1)[0][0]
+    if most_common == 0 and len(counter) == 1:
+        return 0
 
-        counter = Counter(numbers[-1])
-        most_common = counter.most_common(1)[0][0]
-        if most_common == 0 and len(counter) == 1:
-            return sum(x[-1] for x in numbers)
+    # Check differences
+    numbers = []
+    for index in range(1, len(nums)):
+        numbers.append(nums[index] - nums[index - 1])
+
+    # Recall function with differences
+    return nums[-1] + get_value_for_numbers(numbers)
 
 
 def get_input(file_path):
