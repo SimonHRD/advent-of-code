@@ -1,3 +1,6 @@
+import math
+
+
 def main():
     part_1()
     part_2()
@@ -7,22 +10,26 @@ def part_1():
     inp = get_input('./inputs/08_actual.txt')
     instructions, steps = parse_input(inp)
 
-    total = 0
-
-    current_key = 'AAA'
-    while not current_key == 'ZZZ':
-        for instruction in instructions:
-            current_key = steps[current_key][instruction]
-            total += 1
-            if current_key == 'ZZZ':
-                break
+    total = count_nodes('AAA', instructions, steps)
 
     print('Part 1:', total)
 
 
 def part_2():
-    # TODO: Part 2
-    ...
+    inp = get_input('./inputs/08_actual.txt')
+    instructions, steps = parse_input(inp)
+
+    # Get nodes ending with A (starting nodes)
+    nodes = []
+    for node in steps.keys():
+        if node[-1] == 'A':
+            nodes.append(node)
+
+    totals = []
+    for node in nodes:
+        totals.append(count_nodes(node, instructions, steps, ghost_mode=True))
+
+    print('Part 2:', math.lcm(*totals))
 
 
 def parse_input(inp):
@@ -38,6 +45,27 @@ def parse_input(inp):
         }
 
     return list(instructions), steps_parsed
+
+
+def count_nodes(node: str, instructions: [], steps: {}, ghost_mode=False) -> int:
+    """ Returns the number of nodes needed till the finish
+
+    :param node: The starting node
+    :param instructions: The instructions as a list
+    :param steps: All the nodes with their steps
+    :param ghost_mode: If the map is for a ghost
+    :return: THe number of nodes to check till the finish.
+    """
+    total = 0
+
+    while True:
+        for instruction in instructions:
+            node = steps[node][instruction]
+            total += 1
+            if not ghost_mode and node == 'ZZZ':
+                return total
+            elif ghost_mode and node[-1] == 'Z':
+                return total
 
 
 def get_input(file_path):
